@@ -152,6 +152,8 @@ class TrackingActivity : AppCompatActivity() {
         // Apply font and text size preferences
         applyFontAndTextSizePreferences()
 
+        applyTrackingUiPreferences()
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         val assetMbtiles = sharedPreferences.getString("asset_mbtiles", "none")
@@ -272,8 +274,14 @@ class TrackingActivity : AppCompatActivity() {
             map?.animateCamera(CameraUpdateFactory.zoomOut())
         }
         
-        // Setup sidebar button (always visible)
-        binding.fabRidingSidebar.visibility = View.VISIBLE
+        // Setup sidebar button (visibility controlled by settings)
+        if (PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("tracking_show_settings_button", true)
+        ) {
+            binding.fabRidingSidebar.visibility = View.VISIBLE
+        } else {
+            binding.fabRidingSidebar.visibility = View.GONE
+        }
         binding.fabRidingSidebar.setOnClickListener {
             showRidingSidebarMenu()
         }
@@ -289,6 +297,27 @@ class TrackingActivity : AppCompatActivity() {
         
         // Load and apply UI order preferences
         applyUIOrderPreferences()
+    }
+
+    private fun applyTrackingUiPreferences() {
+        if (!::binding.isInitialized) return
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+
+        binding.layoutDistance.visibility = if (prefs.getBoolean("tracking_show_distance", true)) View.VISIBLE else View.GONE
+        binding.layoutAvgSpeed.visibility = if (prefs.getBoolean("tracking_show_avg_speed", true)) View.VISIBLE else View.GONE
+        binding.layoutCurrentSpeed.visibility = if (prefs.getBoolean("tracking_show_current_speed", true)) View.VISIBLE else View.GONE
+        binding.layoutTime.visibility = if (prefs.getBoolean("tracking_show_time", true)) View.VISIBLE else View.GONE
+
+        val zoomVisible = prefs.getBoolean("tracking_show_zoom_buttons", true)
+        binding.fabZoomIn.visibility = if (zoomVisible) View.VISIBLE else View.GONE
+        binding.fabZoomOut.visibility = if (zoomVisible) View.VISIBLE else View.GONE
+
+        val settingsVisible = prefs.getBoolean("tracking_show_settings_button", true)
+        // fabRidingSidebar can also be toggled by runtime tracking state; keep the preference as an upper bound.
+        if (!settingsVisible) {
+            binding.fabRidingSidebar.visibility = View.GONE
+        }
     }
 
     private fun addRouteLayerToStyle(style: Style) {
@@ -1103,6 +1132,7 @@ class TrackingActivity : AppCompatActivity() {
 
     override fun onResume() { 
         super.onResume()
+        applyTrackingUiPreferences()
         updateUIPreferences()
         binding.mapView.onResume()
         startContinuousLocationUpdates()

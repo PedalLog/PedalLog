@@ -37,21 +37,21 @@
         app:layout_constraintTop_toBottomOf="@+id/textView"
         tools:text="No data yet" />
 
-    <com.db.williamchart.view.LineChartView
-        android:id="@+id/lineChart"
+    <com.db.williamchart.view.BarChartView
+        android:id="@+id/barChart"
         android:layout_width="match_parent"
-        android:paddingTop="20dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
+        android:paddingTop="20dp"
         android:paddingBottom="20dp"
         app:chart_axis="none"
         app:chart_gridEffect="dotted"
         app:chart_labelsColor="?android:attr/textColorPrimary"
         app:chart_labelsSize="10sp"
-        app:chart_lineColor="?attr/colorSecondary"
-        app:chart_lineThickness="3dp"
-        app:chart_smoothLine="true"
+        app:chart_spacing="10dp"
+        app:chart_barsColor="?attr/colorSecondary"
+        app:chart_barsRadius="6dp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

@@ -13,11 +13,13 @@ import android.location.Location
 import android.os.Build
 import android.os.Looper
 import android.os.SystemClock
+import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -88,7 +90,10 @@ class TrackingService : LifecycleService() {
         val timeRunInMillis =
             MutableLiveData<Long>() // Total time elapsed since our service was started or resumed
         val currentSpeed = MutableLiveData<Float>() // Current speed in m/s
+        val distanceMeters = MutableLiveData<Float>() // Total distance in meters
     }
+
+    private var totalDistanceMeters: Float = 0f
 
     // This function is called whenever our service is created
     override fun onCreate() {
@@ -105,6 +110,9 @@ class TrackingService : LifecycleService() {
 
             // Function to update the notification whenever we are tracking. (We created this function at bottom).
             updateNotificationTrackingState(it)
+
+            // Show floating bar only while tracking (if enabled in settings).
+            updateFloatingBarState(it)
         })
     }
 
@@ -146,6 +154,8 @@ class TrackingService : LifecycleService() {
 
         pauseService()
         postInitialValues()
+
+        stopFloatingBarServiceIfRunning()
         
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(NOTIFICATION_ID)
@@ -159,9 +169,42 @@ class TrackingService : LifecycleService() {
         stopSelf()
     }
 
+    private fun updateFloatingBarState(isTracking: Boolean) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        val enabled = prefs.getBoolean("floating_bar_enabled", false)
+
+        if (!enabled) {
+            stopFloatingBarServiceIfRunning()
+            return
+        }
+
+        val canDraw = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Settings.canDrawOverlays(this)
+        } else {
+            true
+        }
+
+        if (!canDraw) {
+            // Settings screen handles permission request; avoid starting overlay without permission.
+            stopFloatingBarServiceIfRunning()
+            return
+        }
+
+        if (isTracking) {
+            startService(Intent(applicationContext, FloatingBarService::class.java))
+        } else {
+            stopFloatingBarServiceIfRunning()
+        }
+    }
+
+    private fun stopFloatingBarServiceIfRunning() {
+        stopService(Intent(applicationContext, FloatingBarService::class.java))
+    }
+
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        killService()
+        // Keep tracking running in the background even if the task is removed.
+        // The user can stop tracking explicitly via the app UI/notification.
     }
 
     // Function to pause our service
@@ -269,10 +312,13 @@ class TrackingService : LifecycleService() {
         lapTime = 0L
         timeRun = 0L
 
+        totalDistanceMeters = 0f
+
         isTracking.postValue(false)
         pathPoints.postValue(mutableListOf())
         timeRunInMillis.postValue(0L)
         currentSpeed.postValue(0f)
+        distanceMeters.postValue(0f)
     }
 
     // Function to add an empty polyline to our data members when there is a pause and resume distance gap between two locations
@@ -287,6 +333,21 @@ class TrackingService : LifecycleService() {
             // Get latitudes and longitudes of user's current location
             val pos = LatLng(location.latitude, location.longitude)
             pathPoints.value?.apply {
+                // Increment distance using the previous point (if any)
+                val lastPoint = lastOrNull()?.lastOrNull()
+                if (lastPoint != null) {
+                    val result = FloatArray(1)
+                    Location.distanceBetween(
+                        lastPoint.latitude,
+                        lastPoint.longitude,
+                        pos.latitude,
+                        pos.longitude,
+                        result
+                    )
+                    totalDistanceMeters += result[0]
+                    distanceMeters.postValue(totalDistanceMeters)
+                }
+
                 // Add the position to end of our pathPoints variable
                 last().add(pos)
                 pathPoints.postValue(this)

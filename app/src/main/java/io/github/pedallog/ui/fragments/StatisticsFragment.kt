@@ -1,6 +1,5 @@
 package io.github.pedallog.ui.fragments
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
@@ -8,6 +7,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.db.williamchart.slidertooltip.SliderTooltip
+import com.db.williamchart.ExperimentalFeature
 import io.github.pedallog.R
 import io.github.pedallog.databinding.FragmentStatisticsBinding
 import io.github.pedallog.other.TrackingUtility
@@ -23,32 +23,25 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
     val viewModel: PedalLogViewModel by viewModels()
     lateinit var binding: FragmentStatisticsBinding
 
-    @Suppress("OPT_IN_USAGE")
+    @OptIn(ExperimentalFeature::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentStatisticsBinding.bind(view)
 
-        // Setting chart view visiblity to gone to avoid not initialized exception. Will set it to visible when we have atleast 2 or more journies in our database list
-        binding.lineChart.visibility = View.GONE
+        // Hide chart view until we have enough data.
+        binding.barChart.visibility = View.GONE
         binding.tvStatsStatus.visibility = View.GONE
 
-        // Line chart gradient color
+        // Theme-based bar color
         val typedValue = TypedValue()
         requireContext().theme.resolveAttribute(android.R.attr.colorPrimary, typedValue, true)
         val themeColor = typedValue.data
-        
-        binding.lineChart.gradientFillColors =
-            intArrayOf(
-                (themeColor and 0x00FFFFFF) or 0x80000000.toInt(), // 50% alpha of primary color
-                Color.TRANSPARENT
-            )
-        binding.lineChart.lineColor = themeColor
 
-        // Line chart animation effect duration
-        binding.lineChart.animation.duration = 1000L
+        binding.barChart.barsColor = themeColor
+        binding.barChart.animation.duration = 1000L
 
-        // Line chart Tooltip color
-        binding.lineChart.tooltip =
+        // Tooltip color
+        binding.barChart.tooltip =
             SliderTooltip().also {
                 requireContext().theme.resolveAttribute(android.R.attr.textColorPrimary, typedValue, true)
                 it.color = typedValue.data
@@ -60,13 +53,13 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
             // Chart library can throw when not enough points; keep UX explicit.
             when {
                 journeys.isEmpty() -> {
-                    binding.lineChart.visibility = View.GONE
+                    binding.barChart.visibility = View.GONE
                     binding.tvStatsStatus.visibility = View.VISIBLE
                     binding.tvStatsStatus.text = getString(R.string.stats_empty)
                     return@Observer
                 }
                 journeys.size < 2 -> {
-                    binding.lineChart.visibility = View.GONE
+                    binding.barChart.visibility = View.GONE
                     binding.tvStatsStatus.visibility = View.VISIBLE
                     binding.tvStatsStatus.text = getString(R.string.stats_need_more)
                     return@Observer
@@ -77,15 +70,16 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
             }
 
             try {
-                binding.lineChart.visibility = View.VISIBLE
+                binding.barChart.visibility = View.VISIBLE
 
-                val lineSet = mutableListOf<Pair<String, Float>>()
+                // Bar chart: distance per journey, labeled by date.
+                val barSet = mutableListOf<Pair<String, Float>>()
                 val dateFormatX = SimpleDateFormat("MM/dd", Locale.getDefault())
                 for (journey in journeys) {
-                    lineSet.add(Pair(dateFormatX.format(Date(journey.dateCreated)), journey.duration.toFloat()))
+                    barSet.add(Pair(dateFormatX.format(Date(journey.dateCreated)), journey.distance))
                 }
 
-                binding.lineChart.onDataPointTouchListener = { index, _, _ ->
+                binding.barChart.onDataPointTouchListener = { index, _, _ ->
                     val journey = journeys.getOrNull(index)
                     journey?.let { j ->
                         binding.tvSpeed.text = "${j.speed} ${getString(R.string.unit_kmh)}"
@@ -96,10 +90,10 @@ class StatisticsFragment : Fragment(R.layout.fragment_statistics) {
                     }
                 }
 
-                binding.lineChart.animate(lineSet)
+                binding.barChart.animate(barSet)
             } catch (t: Throwable) {
                 Timber.e(t, "Failed to render statistics chart")
-                binding.lineChart.visibility = View.GONE
+                binding.barChart.visibility = View.GONE
                 binding.tvStatsStatus.visibility = View.VISIBLE
                 binding.tvStatsStatus.text = getString(R.string.stats_error)
             }

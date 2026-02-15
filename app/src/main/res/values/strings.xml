@@ -66,6 +66,34 @@
     <string name="mbtiles_file_selected">MBTiles file selected</string>
     <string name="selected_format">Selected: %s</string>
     <string name="essential_permissions_denied">Essential permissions denied. Some features may not work.</string>
+    <string name="background_location_required">Background location permission is required for tracking in the background.</string>
+    <string name="background_location_open_settings">Please grant "Location (Always)" in system settings.</string>
+    <string name="battery_optimization_disable">Disable battery optimization</string>
+    <string name="setup_requirements_missing">Please complete all required steps first.</string>
+    <string name="overlay_permission_required">Overlay permission is required to enable the floating bar.</string>
+
+    <!-- Settings categories -->
+    <string name="pref_category_ui">Appearance</string>
+    <string name="pref_category_map">Map</string>
+    <string name="pref_category_tracking">Tracking</string>
+    <string name="pref_category_backup">Backup</string>
+    <string name="pref_category_floating_bar">Floating Bar</string>
+
+    <!-- Floating bar -->
+    <string name="pref_floating_bar_title">Enable floating bar</string>
+    <string name="pref_floating_bar_summary">Show a small overlay for quick access</string>
+    <string name="floating_bar_title">PedalLog</string>
+
+    <string name="pref_floating_bar_content_title">Floating bar content</string>
+    <string name="floating_bar_content_title">App title</string>
+    <string name="floating_bar_content_time">Elapsed time</string>
+    <string name="floating_bar_content_speed">Current speed</string>
+    <string name="floating_bar_content_distance">Distance</string>
+    <string name="floating_bar_content_avg_speed">Average speed</string>
+
+    <string name="floating_bar_speed_format">%1$.0f km/h</string>
+    <string name="floating_bar_distance_format">%1$.1f km</string>
+    <string name="floating_bar_avg_speed_format">%1$.1f km/h</string>
     <string name="delete_title">Delete</string>
     <string name="delete_journey_message">Are you sure you want to delete this journey?</string>
     <string name="pause">Pause</string>
@@ -160,5 +188,27 @@
     <string name="pref_min_distance_summary">Confirm before discarding journeys longer than this distance (meters)</string>
     <string name="discard_confirm_title">Discard Journey?</string>
     <string name="discard_confirm_message">Are you sure you want to discard this journey? All data will be lost.</string>
+
+    <!-- Journey filter (calendar) -->
+    <string name="journey_filter_pick_date">Pick date</string>
+    <string name="journey_filter_clear">Clear</string>
+
+    <!-- Backup / Import -->
+    <string name="pref_backup_export_title">Backup</string>
+    <string name="pref_backup_export_summary">Export your journeys to a JSON file</string>
+    <string name="pref_backup_import_title">Import</string>
+    <string name="pref_backup_import_summary">Import journeys from a JSON backup file</string>
+    <string name="backup_export_done">Backup exported</string>
+    <string name="backup_export_failed">Backup export failed</string>
+    <string name="backup_import_done">Import completed</string>
+    <string name="backup_import_failed">Import failed</string>
+
+    <!-- Tracking screen content toggles -->
+    <string name="pref_tracking_show_distance">Show distance</string>
+    <string name="pref_tracking_show_avg_speed">Show average speed</string>
+    <string name="pref_tracking_show_current_speed">Show current speed</string>
+    <string name="pref_tracking_show_time">Show time</string>
+    <string name="pref_tracking_show_zoom">Show zoom (+/-) buttons</string>
+    <string name="pref_tracking_show_settings">Show settings button</string>
 </resources>
 
