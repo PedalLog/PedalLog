@@ -27,3 +27,8 @@ Both `copilot/sub-pr-1` and `copilot/sub-pr-3` now point to rebased history.
 ## Status
 
 PR #3 (`copilot/sub-pr-1` → `main`) should now be mergeable once remote branch is updated.
+
+## Note
+
+Successfully pushed rebased `copilot/sub-pr-3` branch. The `copilot/sub-pr-1` branch needs to be updated to match.
+
