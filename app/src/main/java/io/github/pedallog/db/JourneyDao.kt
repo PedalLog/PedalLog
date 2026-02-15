@@ -18,5 +18,11 @@ interface JourneyDao {
     @Query("SELECT * FROM journey WHERE id = :id LIMIT 1")
     suspend fun getJourneyById(id: Int): Journey?
 
+    @Query("SELECT * FROM journey ORDER BY dateCreated DESC")
+    suspend fun getAllJourneysList(): List<Journey>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertJourneys(journeys: List<Journey>)
+
 
 }

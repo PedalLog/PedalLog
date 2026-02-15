@@ -1,8 +1,12 @@
 package io.github.pedallog
 
+import android.content.res.ColorStateList
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +15,40 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.preference.PreferenceGroup
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import androidx.preference.PreferenceScreen
+import androidx.preference.SwitchPreference
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.color.MaterialColors
+import dagger.hilt.android.EntryPointAccessors
+import io.github.pedallog.di.SettingsEntryPoint
+import io.github.pedallog.other.JourneyBackup
+import io.github.pedallog.services.FloatingBarService
+import io.github.pedallog.services.TrackingService
+import io.github.pedallog.ui.SplashActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
+
+    fun restartApp() {
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+            ?: Intent(this, SplashActivity::class.java)
+
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(launchIntent)
+        finishAffinity()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
@@ -57,6 +87,25 @@ class SettingsActivity : AppCompatActivity() {
             
         // Apply UI preferences immediately to maintain system bars visibility
         updateUIPreferences()
+    }
+
+    override fun onPreferenceStartScreen(
+        caller: PreferenceFragmentCompat,
+        pref: PreferenceScreen
+    ): Boolean {
+        val fragment = SettingsFragment().apply {
+            arguments = Bundle().apply {
+                putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, pref.key)
+            }
+        }
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.settings_container, fragment)
+            .addToBackStack(pref.key)
+            .commit()
+
+        return true
     }
 
     override fun onResume() {
@@ -132,6 +181,25 @@ class SettingsActivity : AppCompatActivity() {
 
     class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 
+        private var pendingEnableFloatingBar = false
+
+        private val overlayPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (!pendingEnableFloatingBar) return@registerForActivityResult
+            pendingEnableFloatingBar = false
+
+            val canDraw = canDrawOverlays()
+            if (!canDraw) {
+                Toast.makeText(requireContext(), getString(R.string.overlay_permission_required), Toast.LENGTH_LONG).show()
+                return@registerForActivityResult
+            }
+
+            // Now enable preference + start service.
+            preferenceManager.sharedPreferences?.edit()?.putBoolean("floating_bar_enabled", true)?.apply()
+            startFloatingBarService()
+        }
+
         private val pickMbtilesLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
                 preferenceManager.sharedPreferences?.edit()?.apply {
@@ -144,8 +212,72 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        private val backupExportLauncher = registerForActivityResult(
+            ActivityResultContracts.CreateDocument("application/json")
+        ) { uri ->
+            if (uri == null) return@registerForActivityResult
+
+            val appContext = requireContext().applicationContext
+            val entryPoint = EntryPointAccessors.fromApplication(appContext, SettingsEntryPoint::class.java)
+            val dao = entryPoint.journeyDao()
+
+            lifecycleScope.launch {
+                try {
+                    val json = withContext(Dispatchers.IO) {
+                        val journeys = dao.getAllJourneysList()
+                        JourneyBackup.toJsonString(journeys)
+                    }
+
+                    withContext(Dispatchers.IO) {
+                        appContext.contentResolver.openOutputStream(uri)?.use { os ->
+                            os.write(json.toByteArray(Charsets.UTF_8))
+                        } ?: throw IllegalStateException("Failed to open output stream")
+                    }
+
+                    Toast.makeText(requireContext(), getString(R.string.backup_export_done), Toast.LENGTH_SHORT).show()
+                } catch (t: Throwable) {
+                    Toast.makeText(requireContext(), getString(R.string.backup_export_failed), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        private val backupImportLauncher = registerForActivityResult(
+            ActivityResultContracts.OpenDocument()
+        ) { uri ->
+            if (uri == null) return@registerForActivityResult
+
+            val appContext = requireContext().applicationContext
+            val entryPoint = EntryPointAccessors.fromApplication(appContext, SettingsEntryPoint::class.java)
+            val dao = entryPoint.journeyDao()
+
+            lifecycleScope.launch {
+                try {
+                    val json = withContext(Dispatchers.IO) {
+                        appContext.contentResolver.openInputStream(uri)?.use { input ->
+                            BufferedReader(InputStreamReader(input, Charsets.UTF_8)).readText()
+                        } ?: throw IllegalStateException("Failed to open input stream")
+                    }
+
+                    val journeys = withContext(Dispatchers.Default) {
+                        JourneyBackup.fromJsonString(json)
+                    }
+
+                    withContext(Dispatchers.IO) {
+                        dao.upsertJourneys(journeys)
+                    }
+
+                    Toast.makeText(requireContext(), getString(R.string.backup_import_done), Toast.LENGTH_SHORT).show()
+                } catch (t: Throwable) {
+                    Toast.makeText(requireContext(), getString(R.string.backup_import_failed), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.preferences, rootKey)
+
+            // PreferenceScreen icons are not consistently tinted under Material3 unless we do it.
+            applyPreferenceIconTint()
             
             findPreference<Preference>("map_source")?.apply {
                 updateMapSourceSummary()
@@ -154,6 +286,88 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
             }
+
+            findPreference<Preference>("backup_export")?.setOnPreferenceClickListener {
+                backupExportLauncher.launch("pedallog-backup.json")
+                true
+            }
+
+            findPreference<Preference>("backup_import")?.setOnPreferenceClickListener {
+                backupImportLauncher.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+                true
+            }
+
+            findPreference<SwitchPreference>("floating_bar_enabled")?.setOnPreferenceChangeListener { _, newValue ->
+                val enable = newValue as? Boolean ?: false
+                if (enable) {
+                    if (!canDrawOverlays()) {
+                        pendingEnableFloatingBar = true
+                        requestOverlayPermission()
+                        // Keep it off until permission is granted.
+                        return@setOnPreferenceChangeListener false
+                    }
+                    // Only show floating bar during an active journey.
+                    if (TrackingService.isTracking.value == true) {
+                        startFloatingBarService()
+                    }
+                    true
+                } else {
+                    stopFloatingBarService()
+                    true
+                }
+            }
+        }
+
+        private fun applyPreferenceIconTint() {
+            val colorPrimary = MaterialColors.getColor(
+                requireContext(),
+                androidx.appcompat.R.attr.colorPrimary,
+                0
+            )
+            val tint = ColorStateList.valueOf(colorPrimary)
+            tintIconsRecursively(preferenceScreen, tint)
+        }
+
+        private fun tintIconsRecursively(pref: Preference?, tint: ColorStateList) {
+            if (pref == null) return
+
+            pref.icon?.let { drawable ->
+                val wrapped = DrawableCompat.wrap(drawable).mutate()
+                DrawableCompat.setTintList(wrapped, tint)
+                pref.icon = wrapped
+            }
+
+            if (pref is PreferenceGroup) {
+                for (i in 0 until pref.preferenceCount) {
+                    tintIconsRecursively(pref.getPreference(i), tint)
+                }
+            }
+        }
+
+        private fun startFloatingBarService() {
+            val context = requireContext().applicationContext
+            context.startService(Intent(context, FloatingBarService::class.java))
+        }
+
+        private fun stopFloatingBarService() {
+            val context = requireContext().applicationContext
+            context.stopService(Intent(context, FloatingBarService::class.java))
+        }
+
+        private fun canDrawOverlays(): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Settings.canDrawOverlays(requireContext())
+            } else {
+                true
+            }
+        }
+
+        private fun requestOverlayPermission() {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+                data = Uri.parse("package:${requireContext().packageName}")
+            }
+            overlayPermissionLauncher.launch(intent)
         }
 
         private fun showMapSourceDialog() {
@@ -291,9 +505,13 @@ class SettingsActivity : AppCompatActivity() {
                         "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         "system" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                     }
+
+                    // Restart app to apply theme everywhere.
+                    (activity as? SettingsActivity)?.restartApp()
                 }
                 "app_theme" -> {
-                    activity?.recreate()
+                    // Restart app to apply app color theme everywhere.
+                    (activity as? SettingsActivity)?.restartApp()
                 }
                 "action_bar" -> {
                     // Recreate activity to apply new insets configuration

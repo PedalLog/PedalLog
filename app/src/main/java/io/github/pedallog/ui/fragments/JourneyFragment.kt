@@ -33,6 +33,10 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import javax.inject.Inject
 import io.github.pedallog.ui.JourneyMapActivity
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.TimeZone
 
 // This fragment will display all the journeys tracked using our app
 @AndroidEntryPoint
@@ -42,6 +46,8 @@ class JourneyFragment : Fragment(R.layout.fragment_journey) {
 
     lateinit var binding: FragmentJourneyBinding
     lateinit var adapter: JourneyAdapter
+
+    private var selectedDayRange: Pair<Long, Long>? = null
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -68,8 +74,14 @@ class JourneyFragment : Fragment(R.layout.fragment_journey) {
 
         applyBottomBarPaddingToList()
 
+        setupDateFilter()
+
         viewModel.journeyList.observe(viewLifecycleOwner, Observer {
-            adapter.submitList(it)
+            val journeys = it.orEmpty()
+            val filtered = selectedDayRange?.let { (start, end) ->
+                journeys.filter { j -> j.dateCreated in start..end }
+            } ?: journeys
+            adapter.submitList(filtered)
         })
 
         adapter.setOnItemClickListener {
@@ -87,6 +99,63 @@ class JourneyFragment : Fragment(R.layout.fragment_journey) {
         adapter.setOnMapClickListener {
             showJourneyMap(it)
         }
+    }
+
+    private fun setupDateFilter() {
+        binding.btnPickDate.setOnClickListener {
+            val picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText(getString(R.string.journey_filter_pick_date))
+                .build()
+
+            picker.addOnPositiveButtonClickListener { selectionUtc ->
+                selectedDayRange = computeLocalDayRangeFromUtcSelection(selectionUtc)
+                val display = SimpleDateFormat("yyyy/MM/dd", java.util.Locale.getDefault())
+                    .format(java.util.Date(selectedDayRange!!.first))
+                binding.btnPickDate.text = display
+                binding.btnClearDate.visibility = View.VISIBLE
+                // LiveData observer will re-submit filtered list on next emission;
+                // force-refresh current list for immediate feedback.
+                viewModel.journeyList.value?.let { journeys ->
+                    val (start, end) = selectedDayRange!!
+                    adapter.submitList(journeys.filter { j -> j.dateCreated in start..end })
+                }
+            }
+
+            picker.show(parentFragmentManager, "journeyDatePicker")
+        }
+
+        binding.btnClearDate.setOnClickListener {
+            selectedDayRange = null
+            binding.btnPickDate.setText(R.string.journey_filter_pick_date)
+            binding.btnClearDate.visibility = View.GONE
+            viewModel.journeyList.value?.let { adapter.submitList(it) }
+        }
+    }
+
+    private fun computeLocalDayRangeFromUtcSelection(selectionUtc: Long): Pair<Long, Long> {
+        // MaterialDatePicker returns midnight UTC millis. Extract Y/M/D in UTC,
+        // then build local start/end-of-day for that date.
+        val utcCal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        utcCal.timeInMillis = selectionUtc
+
+        val year = utcCal.get(Calendar.YEAR)
+        val month = utcCal.get(Calendar.MONTH)
+        val day = utcCal.get(Calendar.DAY_OF_MONTH)
+
+        val localStart = Calendar.getInstance()
+        localStart.set(Calendar.YEAR, year)
+        localStart.set(Calendar.MONTH, month)
+        localStart.set(Calendar.DAY_OF_MONTH, day)
+        localStart.set(Calendar.HOUR_OF_DAY, 0)
+        localStart.set(Calendar.MINUTE, 0)
+        localStart.set(Calendar.SECOND, 0)
+        localStart.set(Calendar.MILLISECOND, 0)
+
+        val localEnd = Calendar.getInstance()
+        localEnd.timeInMillis = localStart.timeInMillis
+        localEnd.add(Calendar.DAY_OF_MONTH, 1)
+        localEnd.add(Calendar.MILLISECOND, -1)
+        return localStart.timeInMillis to localEnd.timeInMillis
     }
 
     private fun applyBottomBarPaddingToList() {

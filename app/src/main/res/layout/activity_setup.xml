@@ -124,6 +124,43 @@
                     app:cornerRadius="12dp"
                     app:icon="@drawable/ic_location_on"
                     app:iconTint="?attr/colorOnSecondary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/grantBackgroundLocationButton"
+                    android:text="@string/permission_location_always"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="?attr/colorSurface"
+                    android:textColor="?android:attr/textColorPrimary"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_location_on"
+                    app:iconTint="?android:attr/textColorPrimary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/disableBatteryOptimizationButton"
+                    android:text="@string/battery_optimization_disable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="?attr/colorSurface"
+                    android:textColor="?android:attr/textColorPrimary"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_settings"
+                    app:iconTint="?android:attr/textColorPrimary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/continueButton"
+                    android:text="@string/permission_next"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="?attr/colorSecondary"
+                    android:textColor="?attr/colorOnSecondary"
+                    app:cornerRadius="12dp"
+                    app:icon="@drawable/ic_arrow_forward"
+                    app:iconGravity="textEnd"
+                    app:iconTint="?attr/colorOnSecondary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

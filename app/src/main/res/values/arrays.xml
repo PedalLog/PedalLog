@@ -95,4 +95,20 @@
         <item>medium</item>
         <item>low</item>
     </string-array>
+
+    <string-array name="floating_bar_content_entries">
+        <item>@string/floating_bar_content_title</item>
+        <item>@string/floating_bar_content_time</item>
+        <item>@string/floating_bar_content_speed</item>
+        <item>@string/floating_bar_content_distance</item>
+        <item>@string/floating_bar_content_avg_speed</item>
+    </string-array>
+
+    <string-array name="floating_bar_content_values">
+        <item>title</item>
+        <item>time</item>
+        <item>speed</item>
+        <item>distance</item>
+        <item>avg_speed</item>
+    </string-array>
 </resources>

@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -13,6 +15,7 @@ import androidx.core.view.WindowCompat
 import androidx.preference.PreferenceManager
 import io.github.pedallog.R
 import io.github.pedallog.databinding.ActivitySetupBinding
+import io.github.pedallog.other.TrackingUtility
 
 class SetupActivity : AppCompatActivity() {
 
@@ -27,13 +30,31 @@ class SetupActivity : AppCompatActivity() {
         val coarseLocationGranted = permissions[android.Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
 
         if (fineLocationGranted || coarseLocationGranted) {
-            // Move to step 2: Map selection
-            binding.step1.visibility = View.GONE
-            binding.step2.visibility = View.VISIBLE
-            setupMapSelection()
+            updateStep1Ui()
         } else {
             Toast.makeText(this, getString(R.string.location_permission_required), Toast.LENGTH_LONG).show()
         }
+    }
+
+    private val requestBackgroundLocationLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (!granted) {
+            Toast.makeText(this, getString(R.string.background_location_required), Toast.LENGTH_LONG).show()
+        }
+        updateStep1Ui()
+    }
+
+    private val batteryOptimizationLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        updateStep1Ui()
+    }
+
+    private val appDetailsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        updateStep1Ui()
     }
 
     private fun setupMapSelection() {
@@ -159,6 +180,7 @@ class SetupActivity : AppCompatActivity() {
         binding.startButton.setOnClickListener {
             binding.step0.visibility = View.GONE
             binding.step1.visibility = View.VISIBLE
+            updateStep1Ui()
         }
 
         binding.grantAllPermissionsButton.setOnClickListener {
@@ -171,5 +193,99 @@ class SetupActivity : AppCompatActivity() {
             }
             requestPermissionLauncher.launch(permissions.toTypedArray())
         }
+
+        binding.grantBackgroundLocationButton.setOnClickListener {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                updateStep1Ui()
+                return@setOnClickListener
+            }
+
+            if (TrackingUtility.hasLocationPermissions(this).not()) {
+                Toast.makeText(this, getString(R.string.location_permission_required), Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                requestBackgroundLocationLauncher.launch(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            } else {
+                // Android 11+ requires the user to grant "Always" in system settings.
+                Toast.makeText(this, getString(R.string.background_location_open_settings), Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", packageName, null)
+                }
+                appDetailsLauncher.launch(intent)
+            }
+        }
+
+        binding.disableBatteryOptimizationButton.setOnClickListener {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                updateStep1Ui()
+                return@setOnClickListener
+            }
+
+            val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+            val ignoring = powerManager.isIgnoringBatteryOptimizations(packageName)
+            if (ignoring) {
+                updateStep1Ui()
+                return@setOnClickListener
+            }
+
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            batteryOptimizationLauncher.launch(intent)
+        }
+
+        binding.continueButton.setOnClickListener {
+            if (areSetupRequirementsSatisfied()) {
+                binding.step1.visibility = View.GONE
+                binding.step2.visibility = View.VISIBLE
+                setupMapSelection()
+            } else {
+                Toast.makeText(this, getString(R.string.setup_requirements_missing), Toast.LENGTH_LONG).show()
+            }
+        }
+
+        // Initial UI state (in case step1 is shown immediately via state restoration)
+        updateStep1Ui()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateStep1Ui()
+    }
+
+    private fun areSetupRequirementsSatisfied(): Boolean {
+        val hasForeground = TrackingUtility.hasLocationPermissions(this)
+        val hasBackground = TrackingUtility.hasBackgroundLocationPermission(this)
+        val hasNotification = TrackingUtility.hasNotificationPermission(this)
+        val ignoringBatteryOpt = isBatteryOptimizationIgnored()
+        return hasForeground && hasBackground && hasNotification && ignoringBatteryOpt
+    }
+
+    private fun isBatteryOptimizationIgnored(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        return powerManager.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun updateStep1Ui() {
+        // Only update if step1 is visible or can be interacted with.
+        if (!::binding.isInitialized) return
+
+        val hasForeground = TrackingUtility.hasLocationPermissions(this)
+        val hasBackground = TrackingUtility.hasBackgroundLocationPermission(this)
+        val hasNotification = TrackingUtility.hasNotificationPermission(this)
+        val ignoringBatteryOpt = isBatteryOptimizationIgnored()
+
+        binding.grantAllPermissionsButton.isEnabled = !(hasForeground && hasNotification)
+
+        binding.grantBackgroundLocationButton.visibility = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) View.VISIBLE else View.GONE
+        binding.grantBackgroundLocationButton.isEnabled = hasForeground && !hasBackground
+
+        binding.disableBatteryOptimizationButton.visibility = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) View.VISIBLE else View.GONE
+        binding.disableBatteryOptimizationButton.isEnabled = !ignoringBatteryOpt
+
+        binding.continueButton.isEnabled = hasForeground && hasBackground && hasNotification && ignoringBatteryOpt
     }
 }

@@ -66,6 +66,34 @@
     <string name="mbtiles_file_selected">MBTiles 파일이 선택되었습니다</string>
     <string name="selected_format">선택됨: %s</string>
     <string name="essential_permissions_denied">필수 권한이 거부되었습니다. 일부 기능이 작동하지 않을 수 있습니다.</string>
+    <string name="background_location_required">백그라운드에서 주행을 기록하려면 위치(항상 허용) 권한이 필요합니다.</string>
+    <string name="background_location_open_settings">시스템 설정에서 위치 권한을 "항상 허용"으로 변경해 주세요.</string>
+    <string name="battery_optimization_disable">배터리 최적화 제외</string>
+    <string name="setup_requirements_missing">필수 설정을 모두 완료해 주세요.</string>
+    <string name="overlay_permission_required">플로팅 바를 사용하려면 다른 앱 위에 표시 권한이 필요합니다.</string>
+
+    <!-- Settings categories -->
+    <string name="pref_category_ui">화면/테마</string>
+    <string name="pref_category_map">지도</string>
+    <string name="pref_category_tracking">추적</string>
+    <string name="pref_category_backup">백업</string>
+    <string name="pref_category_floating_bar">플로팅 바</string>
+
+    <!-- Floating bar -->
+    <string name="pref_floating_bar_title">플로팅 바 사용</string>
+    <string name="pref_floating_bar_summary">빠른 접근을 위한 오버레이 바를 표시합니다</string>
+    <string name="floating_bar_title">PedalLog</string>
+
+    <string name="pref_floating_bar_content_title">플로팅 바 표시 내용</string>
+    <string name="floating_bar_content_title">앱 제목</string>
+    <string name="floating_bar_content_time">주행 시간</string>
+    <string name="floating_bar_content_speed">현재 속도</string>
+    <string name="floating_bar_content_distance">거리</string>
+    <string name="floating_bar_content_avg_speed">평균 속도</string>
+
+    <string name="floating_bar_speed_format">%1$.0f km/h</string>
+    <string name="floating_bar_distance_format">%1$.1f km</string>
+    <string name="floating_bar_avg_speed_format">%1$.1f km/h</string>
     <string name="delete_title">삭제</string>
     <string name="delete_journey_message">이 주행을 삭제하시겠습니까?</string>
     <string name="pause">일시정지</string>
@@ -160,4 +188,26 @@
     <string name="pref_min_distance_summary">이 거리(미터) 이상의 주행을 버릴 때 확인 (기본 10m)</string>
     <string name="discard_confirm_title">주행을 버리시겠습니까?</string>
     <string name="discard_confirm_message">정말로 이 주행 기록을 버리시겠습니까? 모든 데이터가 삭제됩니다.</string>
+
+    <!-- Journey filter (calendar) -->
+    <string name="journey_filter_pick_date">날짜 선택</string>
+    <string name="journey_filter_clear">해제</string>
+
+    <!-- Backup / Import -->
+    <string name="pref_backup_export_title">백업</string>
+    <string name="pref_backup_export_summary">주행 기록을 JSON 파일로 내보내기</string>
+    <string name="pref_backup_import_title">가져오기</string>
+    <string name="pref_backup_import_summary">JSON 백업 파일에서 주행 기록 가져오기</string>
+    <string name="backup_export_done">백업을 저장했습니다</string>
+    <string name="backup_export_failed">백업 저장에 실패했습니다</string>
+    <string name="backup_import_done">가져오기가 완료되었습니다</string>
+    <string name="backup_import_failed">가져오기에 실패했습니다</string>
+
+    <!-- Tracking screen content toggles -->
+    <string name="pref_tracking_show_distance">거리 표시</string>
+    <string name="pref_tracking_show_avg_speed">평균 속도 표시</string>
+    <string name="pref_tracking_show_current_speed">현재 속도 표시</string>
+    <string name="pref_tracking_show_time">시간 표시</string>
+    <string name="pref_tracking_show_zoom">확대/축소(+/-) 버튼 표시</string>
+    <string name="pref_tracking_show_settings">설정 버튼 표시</string>
 </resources>
