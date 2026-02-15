@@ -77,7 +77,7 @@
     <string name="background_location">Background location</string>
     <string name="notifications">Notifications</string>
     <string name="battery_optimization">Battery optimization exclusion</string>
-    <string name="overlay_permission_required">Overlay permission is required to enable the floating bar.</string>
+    <string name="overlay_permission_required">Overlay permission is required to enable the floating bar. This permission allows PedalLog to display ride statistics over other apps during your journey.</string>
 
     <!-- Settings categories -->
     <string name="pref_category_ui">Appearance</string>
@@ -88,7 +88,7 @@
 
     <!-- Floating bar -->
     <string name="pref_floating_bar_title">Enable floating bar</string>
-    <string name="pref_floating_bar_summary">Show a small overlay for quick access</string>
+    <string name="pref_floating_bar_summary">Display ride statistics over other apps (requires overlay permission)</string>
     <string name="floating_bar_title">PedalLog</string>
 
     <string name="pref_floating_bar_content_title">Floating bar content</string>
