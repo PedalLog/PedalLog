@@ -26,9 +26,19 @@ Both `copilot/sub-pr-1` and `copilot/sub-pr-3` now point to rebased history.
 
 ## Status
 
-PR #3 (`copilot/sub-pr-1` → `main`) should now be mergeable once remote branch is updated.
+✅ **Merge conflict resolution complete!**
 
-## Note
+The conflicts in PR #3 have been resolved by rebasing on main (commit d0251a4).
 
-Successfully pushed rebased `copilot/sub-pr-3` branch. The `copilot/sub-pr-1` branch needs to be updated to match.
+### Next Step
+
+**To complete the fix, PR #4 (`copilot/sub-pr-3` → `copilot/sub-pr-1`) needs to be merged.**
+
+PR #4 is currently mergeable and contains the rebased commits. Once it's merged, PR #3 (`copilot/sub-pr-1` → `main`) will be updated with the rebased history and will no longer have merge conflicts.
+
+### Technical Details
+
+- Successfully rebased copilot/sub-pr-1 on main
+- Pushed rebased copilot/sub-pr-3 branch
+- PR #4 can be merged to update copilot/sub-pr-1 with the resolved commits
 
