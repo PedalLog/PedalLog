@@ -42,6 +42,9 @@ import java.io.InputStreamReader
 class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartScreenCallback {
 
     fun restartApp() {
+        // Note: finishAffinity() will terminate all activities in the task.
+        // This could cause data loss if there are unsaved changes in any activity.
+        // For now, we restart immediately assuming settings changes don't leave unsaved state.
         val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
             ?: Intent(this, SplashActivity::class.java)
 
@@ -221,6 +224,14 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
             val entryPoint = EntryPointAccessors.fromApplication(appContext, SettingsEntryPoint::class.java)
             val dao = entryPoint.journeyDao()
 
+            // Show progress dialog to prevent navigation during backup
+            val progressDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.backup_export_in_progress))
+                .setMessage(getString(R.string.backup_export_wait))
+                .setCancelable(false)
+                .create()
+            progressDialog.show()
+
             lifecycleScope.launch {
                 try {
                     val json = withContext(Dispatchers.IO) {
@@ -234,8 +245,10 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
                         } ?: throw IllegalStateException("Failed to open output stream")
                     }
 
+                    progressDialog.dismiss()
                     Toast.makeText(requireContext(), getString(R.string.backup_export_done), Toast.LENGTH_SHORT).show()
                 } catch (t: Throwable) {
+                    progressDialog.dismiss()
                     Toast.makeText(requireContext(), getString(R.string.backup_export_failed), Toast.LENGTH_LONG).show()
                 }
             }
@@ -249,6 +262,14 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
             val appContext = requireContext().applicationContext
             val entryPoint = EntryPointAccessors.fromApplication(appContext, SettingsEntryPoint::class.java)
             val dao = entryPoint.journeyDao()
+
+            // Show progress dialog to prevent navigation during restore
+            val progressDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.backup_import_in_progress))
+                .setMessage(getString(R.string.backup_import_wait))
+                .setCancelable(false)
+                .create()
+            progressDialog.show()
 
             lifecycleScope.launch {
                 try {
@@ -266,8 +287,10 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
                         dao.upsertJourneys(journeys)
                     }
 
+                    progressDialog.dismiss()
                     Toast.makeText(requireContext(), getString(R.string.backup_import_done), Toast.LENGTH_SHORT).show()
                 } catch (t: Throwable) {
+                    progressDialog.dismiss()
                     Toast.makeText(requireContext(), getString(R.string.backup_import_failed), Toast.LENGTH_LONG).show()
                 }
             }

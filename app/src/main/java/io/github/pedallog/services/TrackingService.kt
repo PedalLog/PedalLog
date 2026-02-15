@@ -219,7 +219,9 @@ class TrackingService : LifecycleService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         // Keep tracking running in the background even if the task is removed.
-        // The user can stop tracking explicitly via the app UI/notification.
+        // This is intentional: users often swipe away the app during a ride.
+        // The foreground notification remains visible with controls to pause/stop tracking.
+        // If battery drain is a concern, users can stop tracking via the notification.
     }
 
     // Function to pause our service
