@@ -1,0 +1,97 @@
+# Dependabot Configuration for PedalLog
+# Automatically checks for dependency updates and creates pull requests
+
+version: 2
+
+updates:
+  # Gradle wrapper updates
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Only stable versions, no pre-releases
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    # Minimize PR noise by grouping updates
+    groups:
+      gradle-wrapper:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "gradle"
+    open-pull-requests-limit: 5
+
+  # Gradle dependencies and plugins via Version Catalog
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    # Target the version catalog file
+    # Dependabot automatically detects and updates libs.versions.toml
+    ignore:
+      # Skip major version updates for stability
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    # Group related dependencies to reduce PR noise
+    groups:
+      # AndroidX dependencies
+      androidx:
+        patterns:
+          - "androidx.*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Kotlin dependencies
+      kotlin:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "org.jetbrains.kotlinx*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Android build tools and plugins
+      android-tools:
+        patterns:
+          - "com.android.*"
+          - "com.google.devtools.ksp"
+        update-types:
+          - "minor"
+          - "patch"
+      # Google dependencies
+      google:
+        patterns:
+          - "com.google.*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Testing dependencies
+      testing:
+        patterns:
+          - "junit*"
+          - "androidx.test.*"
+        update-types:
+          - "minor"
+          - "patch"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "gradle"
+    open-pull-requests-limit: 10
+    # Reviewers can be added when needed
+    # reviewers:
+    #   - "username"
+    # assignees:
+    #   - "username"
