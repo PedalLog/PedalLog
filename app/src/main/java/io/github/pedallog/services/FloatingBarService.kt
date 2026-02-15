@@ -19,6 +19,7 @@ import io.github.pedallog.R
 import io.github.pedallog.other.TrackingUtility
 import io.github.pedallog.ui.TrackingActivity
 import androidx.lifecycle.Observer
+import android.view.ViewConfiguration
 
 class FloatingBarService : Service() {
 
@@ -72,8 +73,16 @@ class FloatingBarService : Service() {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
-            x = 24
-            y = 200
+            // Use saved position if available, otherwise center the floating bar
+            val savedX = prefs.getInt("floating_bar_x", Int.MIN_VALUE)
+            val savedY = prefs.getInt("floating_bar_y", Int.MIN_VALUE)
+            if (savedX != Int.MIN_VALUE && savedY != Int.MIN_VALUE) {
+                x = savedX
+                y = savedY
+            } else {
+                // Center the floating bar initially
+                gravity = Gravity.CENTER
+            }
         }
 
         floatingView?.setOnClickListener {
@@ -114,6 +123,14 @@ class FloatingBarService : Service() {
         contentTextView = null
         windowManager = null
         layoutParams = null
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        // Remove observers on unbind as well to prevent leaks
+        TrackingService.timeRunInMillis.removeObserver(timeObserver)
+        TrackingService.currentSpeed.removeObserver(speedObserver)
+        TrackingService.distanceMeters.removeObserver(distanceObserver)
+        return super.onUnbind(intent)
     }
 
     private fun updateContentText() {
@@ -172,6 +189,7 @@ class FloatingBarService : Service() {
         private var initialY = 0
         private var touchX = 0f
         private var touchY = 0f
+        private val touchSlop = ViewConfiguration.get(this@FloatingBarService).scaledTouchSlop
 
         override fun onTouch(v: View, event: MotionEvent): Boolean {
             val params = layoutParams ?: return false
@@ -194,10 +212,19 @@ class FloatingBarService : Service() {
                 }
 
                 MotionEvent.ACTION_UP -> {
+                    // Save the position for next time
+                    prefs.edit().apply {
+                        putInt("floating_bar_x", params.x)
+                        putInt("floating_bar_y", params.y)
+                        apply()
+                    }
+                    
                     // Allow click if it was basically a tap (small movement)
                     val dx = (event.rawX - touchX)
                     val dy = (event.rawY - touchY)
-                    if (dx * dx + dy * dy < 25f) {
+                    val distanceSquared = dx * dx + dy * dy
+                    val threshold = touchSlop * touchSlop
+                    if (distanceSquared < threshold) {
                         v.performClick()
                     }
                     return true

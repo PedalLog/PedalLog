@@ -49,6 +49,11 @@ class JourneyFragment : Fragment(R.layout.fragment_journey) {
 
     private var selectedDayRange: Pair<Long, Long>? = null
 
+    companion object {
+        private const val KEY_SELECTED_DAY_START = "selected_day_start"
+        private const val KEY_SELECTED_DAY_END = "selected_day_end"
+    }
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -65,6 +70,20 @@ class JourneyFragment : Fragment(R.layout.fragment_journey) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentJourneyBinding.bind(view)
+        
+        // Restore saved date filter state
+        savedInstanceState?.let {
+            val start = it.getLong(KEY_SELECTED_DAY_START, -1L)
+            val end = it.getLong(KEY_SELECTED_DAY_END, -1L)
+            if (start != -1L && end != -1L) {
+                selectedDayRange = start to end
+                val display = SimpleDateFormat("yyyy/MM/dd", java.util.Locale.getDefault())
+                    .format(java.util.Date(start))
+                binding.btnPickDate.text = display
+                binding.btnClearDate.visibility = View.VISIBLE
+            }
+        }
+        
         requestPermissions()
 
         adapter = JourneyAdapter()
@@ -132,6 +151,14 @@ class JourneyFragment : Fragment(R.layout.fragment_journey) {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        selectedDayRange?.let { (start, end) ->
+            outState.putLong(KEY_SELECTED_DAY_START, start)
+            outState.putLong(KEY_SELECTED_DAY_END, end)
+        }
+    }
+
     private fun computeLocalDayRangeFromUtcSelection(selectionUtc: Long): Pair<Long, Long> {
         // MaterialDatePicker returns midnight UTC millis. Extract Y/M/D in UTC,
         // then build local start/end-of-day for that date.
@@ -154,6 +181,7 @@ class JourneyFragment : Fragment(R.layout.fragment_journey) {
         val localEnd = Calendar.getInstance()
         localEnd.timeInMillis = localStart.timeInMillis
         localEnd.add(Calendar.DAY_OF_MONTH, 1)
+        // Use start of next day (exclusive) - subtract 1ms for inclusive comparison
         localEnd.add(Calendar.MILLISECOND, -1)
         return localStart.timeInMillis to localEnd.timeInMillis
     }

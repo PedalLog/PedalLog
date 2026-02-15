@@ -99,7 +99,16 @@ class TrackingService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
 
+        // Restore persisted distance if available
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        totalDistanceMeters = prefs.getFloat("tracking_distance_meters", 0f)
+
         postInitialValues() // Function to post empty values to our live data. (We created this function at bottom).
+
+        // Restore distance to LiveData if we had a saved value
+        if (totalDistanceMeters > 0f) {
+            distanceMeters.postValue(totalDistanceMeters)
+        }
 
         // Initially we set curNotificationBuilder to baseNotificationBuilder to avoid lateinit not initialized exception
         curNotificationBuilder = baseNotificationBuilder
@@ -154,6 +163,12 @@ class TrackingService : LifecycleService() {
 
         pauseService()
         postInitialValues()
+        
+        // Clear persisted distance when journey ends
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .edit()
+            .remove("tracking_distance_meters")
+            .apply()
 
         stopFloatingBarServiceIfRunning()
         
@@ -346,6 +361,12 @@ class TrackingService : LifecycleService() {
                     )
                     totalDistanceMeters += result[0]
                     distanceMeters.postValue(totalDistanceMeters)
+                    
+                    // Persist distance to SharedPreferences
+                    PreferenceManager.getDefaultSharedPreferences(this@TrackingService)
+                        .edit()
+                        .putFloat("tracking_distance_meters", totalDistanceMeters)
+                        .apply()
                 }
 
                 // Add the position to end of our pathPoints variable

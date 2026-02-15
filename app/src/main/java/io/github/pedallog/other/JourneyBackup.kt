@@ -5,6 +5,7 @@ import io.github.pedallog.db.Converters
 import io.github.pedallog.db.Journey
 import org.json.JSONArray
 import org.json.JSONObject
+import timber.log.Timber
 
 object JourneyBackup {
     private const val KEY_VERSION = "version"
@@ -69,7 +70,8 @@ object JourneyBackup {
                 try {
                     val bytes = Base64.decode(imgBase64, Base64.DEFAULT)
                     converters.toBitmap(bytes)
-                } catch (_: Throwable) {
+                } catch (t: Throwable) {
+                    Timber.e(t, "Failed to decode Base64 image data for journey at index $i")
                     null
                 }
             } else null
