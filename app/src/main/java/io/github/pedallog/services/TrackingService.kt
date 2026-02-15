@@ -84,6 +84,8 @@ class TrackingService : LifecycleService() {
 
 
     companion object {
+        private const val KEY_PERSISTED_DISTANCE = "tracking_distance_meters"
+        
         val isTracking = MutableLiveData<Boolean>() // Whether we want to track our user or not
         val pathPoints =
             MutableLiveData<Polylines>() // This is the list of paths or lines where user has travelled
@@ -101,7 +103,7 @@ class TrackingService : LifecycleService() {
 
         // Restore persisted distance if available
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        totalDistanceMeters = prefs.getFloat("tracking_distance_meters", 0f)
+        totalDistanceMeters = prefs.getFloat(KEY_PERSISTED_DISTANCE, 0f)
 
         postInitialValues() // Function to post empty values to our live data. (We created this function at bottom).
 
@@ -167,7 +169,7 @@ class TrackingService : LifecycleService() {
         // Clear persisted distance when journey ends
         PreferenceManager.getDefaultSharedPreferences(this)
             .edit()
-            .remove("tracking_distance_meters")
+            .remove(KEY_PERSISTED_DISTANCE)
             .apply()
 
         stopFloatingBarServiceIfRunning()
@@ -367,7 +369,7 @@ class TrackingService : LifecycleService() {
                     // Persist distance to SharedPreferences
                     PreferenceManager.getDefaultSharedPreferences(this@TrackingService)
                         .edit()
-                        .putFloat("tracking_distance_meters", totalDistanceMeters)
+                        .putFloat(KEY_PERSISTED_DISTANCE, totalDistanceMeters)
                         .apply()
                 }
 

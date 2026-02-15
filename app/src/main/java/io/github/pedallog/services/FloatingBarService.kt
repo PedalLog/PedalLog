@@ -40,6 +40,18 @@ class FloatingBarService : Service() {
     private val speedObserver = Observer<Float> { updateContentText() }
     private val distanceObserver = Observer<Float> { updateContentText() }
 
+    private companion object {
+        const val KEY_CONTENT = "floating_bar_content"
+        const val KEY_POSITION_X = "floating_bar_x"
+        const val KEY_POSITION_Y = "floating_bar_y"
+
+        const val CONTENT_TITLE = "title"
+        const val CONTENT_TIME = "time"
+        const val CONTENT_SPEED = "speed"
+        const val CONTENT_DISTANCE = "distance"
+        const val CONTENT_AVG_SPEED = "avg_speed"
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -74,8 +86,8 @@ class FloatingBarService : Service() {
         ).apply {
             gravity = Gravity.TOP or Gravity.START
             // Use saved position if available, otherwise center the floating bar
-            val savedX = prefs.getInt("floating_bar_x", Int.MIN_VALUE)
-            val savedY = prefs.getInt("floating_bar_y", Int.MIN_VALUE)
+            val savedX = prefs.getInt(KEY_POSITION_X, Int.MIN_VALUE)
+            val savedY = prefs.getInt(KEY_POSITION_Y, Int.MIN_VALUE)
             if (savedX != Int.MIN_VALUE && savedY != Int.MIN_VALUE) {
                 x = savedX
                 y = savedY
@@ -174,16 +186,6 @@ class FloatingBarService : Service() {
         }
     }
 
-    private companion object {
-        const val KEY_CONTENT = "floating_bar_content"
-
-        const val CONTENT_TITLE = "title"
-        const val CONTENT_TIME = "time"
-        const val CONTENT_SPEED = "speed"
-        const val CONTENT_DISTANCE = "distance"
-        const val CONTENT_AVG_SPEED = "avg_speed"
-    }
-
     private inner class DragTouchListener : View.OnTouchListener {
         private var initialX = 0
         private var initialY = 0
@@ -214,8 +216,8 @@ class FloatingBarService : Service() {
                 MotionEvent.ACTION_UP -> {
                     // Save the position for next time
                     prefs.edit().apply {
-                        putInt("floating_bar_x", params.x)
-                        putInt("floating_bar_y", params.y)
+                        putInt(KEY_POSITION_X, params.x)
+                        putInt(KEY_POSITION_Y, params.y)
                         apply()
                     }
                     
