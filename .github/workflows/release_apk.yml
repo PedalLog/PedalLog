@@ -63,12 +63,12 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Make gradlew executable
-        run: chmod +x android/gradlew
+        run: chmod +x gradlew
 
       - name: Decode keystore
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" \
-            | base64 --decode > android/app/pedallog-release.keystore
+            | base64 --decode > app/pedallog-release.keystore
 
       - name: Build Release APK
         env:
@@ -76,7 +76,6 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          cd android
           ./gradlew assembleRelease \
             --parallel \
             --build-cache \
@@ -86,4 +85,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: android/app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/release/*.apk
