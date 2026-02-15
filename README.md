@@ -1,7 +1,7 @@
-# PedalLog
-
+<h1 align="center">PedalLog</h1>
+  
 <p align="center">
-  <img src="img/logo/PedalLogo_No_Background.svg" alt="PedalLog" width="160" />
+  <img src="img/logo/PedalLogo_Background.png" alt="PedalLog" width="160" />
 </p>
 
 <p align="center">
@@ -17,7 +17,7 @@
 PedalLog is an Android tracking and stats app for cyclists. It records your rides with real-time GPS tracking and turns them into weekly/monthly insights.
 
 > [!NOTE]
-> This project is transitioning from Google Maps to OpenStreetMap via MapLibre. It is a fork of [ishantchauhan710/BikeRush](https://github.com/ishantchauhan710/BikeRush).
+> This project is a fork of [ishantchauhan710/BikeRush](https://github.com/ishantchauhan710/BikeRush).
 
 ---
 
