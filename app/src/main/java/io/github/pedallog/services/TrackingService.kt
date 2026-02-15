@@ -84,6 +84,8 @@ class TrackingService : LifecycleService() {
 
 
     companion object {
+        private const val KEY_PERSISTED_DISTANCE = "tracking_distance_meters"
+        
         val isTracking = MutableLiveData<Boolean>() // Whether we want to track our user or not
         val pathPoints =
             MutableLiveData<Polylines>() // This is the list of paths or lines where user has travelled
@@ -99,7 +101,16 @@ class TrackingService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
 
+        // Restore persisted distance if available
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        totalDistanceMeters = prefs.getFloat(KEY_PERSISTED_DISTANCE, 0f)
+
         postInitialValues() // Function to post empty values to our live data. (We created this function at bottom).
+
+        // Restore distance to LiveData if we had a saved value
+        if (totalDistanceMeters > 0f) {
+            distanceMeters.postValue(totalDistanceMeters)
+        }
 
         // Initially we set curNotificationBuilder to baseNotificationBuilder to avoid lateinit not initialized exception
         curNotificationBuilder = baseNotificationBuilder
@@ -154,6 +165,12 @@ class TrackingService : LifecycleService() {
 
         pauseService()
         postInitialValues()
+        
+        // Clear persisted distance when journey ends
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .edit()
+            .remove(KEY_PERSISTED_DISTANCE)
+            .apply()
 
         stopFloatingBarServiceIfRunning()
         
@@ -204,7 +221,9 @@ class TrackingService : LifecycleService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         // Keep tracking running in the background even if the task is removed.
-        // The user can stop tracking explicitly via the app UI/notification.
+        // This is intentional: users often swipe away the app during a ride.
+        // The foreground notification remains visible with controls to pause/stop tracking.
+        // If battery drain is a concern, users can stop tracking via the notification.
     }
 
     // Function to pause our service
@@ -346,6 +365,12 @@ class TrackingService : LifecycleService() {
                     )
                     totalDistanceMeters += result[0]
                     distanceMeters.postValue(totalDistanceMeters)
+                    
+                    // Persist distance to SharedPreferences
+                    PreferenceManager.getDefaultSharedPreferences(this@TrackingService)
+                        .edit()
+                        .putFloat(KEY_PERSISTED_DISTANCE, totalDistanceMeters)
+                        .apply()
                 }
 
                 // Add the position to end of our pathPoints variable

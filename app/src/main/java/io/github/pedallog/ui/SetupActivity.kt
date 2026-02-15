@@ -237,12 +237,41 @@ class SetupActivity : AppCompatActivity() {
         }
 
         binding.continueButton.setOnClickListener {
-            if (areSetupRequirementsSatisfied()) {
+            val hasForeground = TrackingUtility.hasLocationPermissions(this)
+            val hasBackground = TrackingUtility.hasBackgroundLocationPermission(this)
+            val hasNotification = TrackingUtility.hasNotificationPermission(this)
+            val ignoringBatteryOpt = isBatteryOptimizationIgnored()
+            
+            if (!hasForeground) {
+                // Foreground location is absolutely required
+                Toast.makeText(this, getString(R.string.location_permission_required), Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            
+            // Warn about missing optional but recommended permissions
+            val missingPermissions = mutableListOf<String>()
+            if (!hasBackground) missingPermissions.add(getString(R.string.background_location))
+            if (!hasNotification) missingPermissions.add(getString(R.string.notifications))
+            if (!ignoringBatteryOpt) missingPermissions.add(getString(R.string.battery_optimization))
+            
+            if (missingPermissions.isNotEmpty()) {
+                val warningMessage = getString(R.string.setup_warning_missing_permissions, missingPermissions.joinToString(", "))
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(R.string.setup_warning_title)
+                    .setMessage(warningMessage)
+                    .setPositiveButton(R.string.continue_anyway) { _, _ ->
+                        // Allow user to continue anyway
+                        binding.step1.visibility = View.GONE
+                        binding.step2.visibility = View.VISIBLE
+                        setupMapSelection()
+                    }
+                    .setNegativeButton(R.string.go_back, null)
+                    .show()
+            } else {
+                // All permissions granted, proceed
                 binding.step1.visibility = View.GONE
                 binding.step2.visibility = View.VISIBLE
                 setupMapSelection()
-            } else {
-                Toast.makeText(this, getString(R.string.setup_requirements_missing), Toast.LENGTH_LONG).show()
             }
         }
 
