@@ -1,0 +1,163 @@
+<resources>
+    <string name="app_name">PedalLog</string>
+
+    <!-- SetupActivity -->
+    <string name="welcome_title">PedalLog에 오신 것을 환영합니다!</string>
+    <string name="welcome_desc">시작하기 전에 몇 가지 설정이 필요합니다.</string>
+    <string name="start">시작하기</string>
+
+    <string name="permission_title">권한</string>
+    <string name="permission_desc">자전거 주행을 기록하려면 위치 접근 권한이 필요합니다. 아래 권한을 허용해 주세요.</string>
+    <string name="permission_location_foreground">위치 (앱 사용 중)</string>
+    <string name="permission_location_always">위치 (항상 허용)</string>
+    <string name="permission_start_tracking">추적 서비스 시작</string>
+    <string name="permission_next">다음</string>
+
+    <string name="file_title">.MBTILES 파일</string>
+    <string name="file_desc">이전 주행 기록을 가져오려면 .MBTILES 파일을 선택하세요.</string>
+    <string name="file_open">MBTILES 파일 열기</string>
+    <string name="settings">설정</string>
+    <string name="github">GitHub</string>
+    <string name="app_settings">앱 설정</string>
+
+    <!-- Shared Labels -->
+    <string name="speed">속도</string>
+    <string name="distance">거리</string>
+    <string name="duration">시간</string>
+    <string name="date">날짜</string>
+    <string name="avg_speed">평균 속도</string>
+    <string name="current_speed">현재 속도</string>
+    <string name="time">시간</string>
+
+    <!-- Buttons -->
+    <string name="start_button">시작</string>
+    <string name="stop_button">정지</string>
+    <string name="save_button">저장</string>
+    <string name="grant_permissions">필수 권한 허용</string>
+
+    <!-- Menu Items -->
+    <string name="menu_journey">주행</string>
+    <string name="menu_stats">통계</string>
+
+    <!-- Dialogs & Toasts -->
+    <string name="location_services_required">주행을 기록하려면 위치 서비스가 활성화되어 있어야 합니다.</string>
+    <string name="failed_load_mbtiles">MBTiles 파일을 불러오지 못했습니다</string>
+    <string name="map_file_required_title">지도 파일 필요</string>
+    <string name="map_file_required_message">오프라인 지도를 사용하려면 MBTiles 파일이 필요합니다. 설정에서 선택하시겠습니까?</string>
+    <string name="cancel">취소</string>
+    <string name="mbtiles_loaded">MBTiles 지도가 로드되었습니다</string>
+    <string name="mbtiles_server_error">MBTiles 서버 설정 중 오류 발생</string>
+    <string name="journey_saved_successfully">주행이 성공적으로 저장되었습니다</string>
+    <string name="save_journey_title">저장하시겠습니까?</string>
+    <string name="save_journey_message">이 주행 기록을 저장하시겠습니까?</string>
+    <string name="discard">버리기</string>
+    <string name="no_data_title">데이터 없음</string>
+    <string name="no_data_to_save">저장할 주행 데이터가 없습니다</string>
+    <string name="insufficient_distance">기록된 거리가 부족합니다 (최소 10미터)</string>
+    <string name="stop_tracking_first">저장하기 전에 주행을 중지해주세요</string>
+    <string name="ok">확인</string>
+    <string name="cancel_journey_title">주행 취소</string>
+    <string name="cancel_journey_message">이 주행을 취소하시겠습니까?</string>
+    <string name="yes">예</string>
+    <string name="no">아니오</string>
+    <string name="location_permission_required">주행을 기록하려면 위치 권한이 필요합니다.</string>
+    <string name="file_permission_failed">파일 권한을 가져오지 못했습니다.</string>
+    <string name="select_mbtiles_file">.mbtiles 파일을 선택하세요</string>
+    <string name="mbtiles_file_selected">MBTiles 파일이 선택되었습니다</string>
+    <string name="selected_format">선택됨: %s</string>
+    <string name="essential_permissions_denied">필수 권한이 거부되었습니다. 일부 기능이 작동하지 않을 수 있습니다.</string>
+    <string name="delete_title">삭제</string>
+    <string name="delete_journey_message">이 주행을 삭제하시겠습니까?</string>
+    <string name="pause">일시정지</string>
+    <string name="resume">재개</string>
+    <string name="view_details">상세보기</string>
+    <string name="analyze">분석</string>
+    <string name="journey_details_title">주행 상세</string>
+    <string name="journey_map_title">주행 지도</string>
+    <string name="journey_map_unavailable">이 주행에 대한 지도 이미지가 없습니다.</string>
+    <string name="end_journey">주행 종료</string>
+    <string name="cancel_ride">취소</string>
+    <string name="go_home">홈으로</string>
+    <string name="customize_ui">UI 사용자 설정</string>
+    <string name="ui_order_title">표시 순서 설정</string>
+    <string name="ui_order_message">데이터 필드를 드래그하여 순서를 변경하세요</string>
+    <string name="menu">메뉴</string>
+    <string name="pref_thumbnail_quality_title">주행 썸네일 화질</string>
+    <string name="pref_thumbnail_quality_summary">저장되는 주행 지도 썸네일의 화질을 선택하세요</string>
+    <string name="quality_high">고</string>
+    <string name="quality_medium">중</string>
+    <string name="quality_low">저</string>
+
+    <!-- Preferences -->
+    <string name="pref_nav_bar_title">시스템 네비게이션 바</string>
+    <string name="pref_action_bar_title">시스템 상태 바</string>
+    <string name="pref_map_file_title">지도 파일</string>
+    <string name="pref_pick_mbtiles_title">MBTiles 파일 선택</string>
+    <string name="pref_pick_mbtiles_summary">오프라인 지도를 위한 .mbtiles 파일을 선택하세요</string>
+    <string name="pref_theme_title">테마 설정</string>
+
+    <!-- Map & Theme Options -->
+    <string name="map_default">기본 지도</string>
+    <string name="map_satellite">위성 지도</string>
+    <string name="theme_light">라이트</string>
+    <string name="theme_dark">다크</string>
+    <string name="theme_system">시스템 기본값</string>
+
+    <string name="notification_channel_name">PedalLog 추적</string>
+
+    <!-- Units -->
+    <string name="unit_km">km</string>
+    <string name="unit_m">m</string>
+    <string name="unit_kmh">km/h</string>
+    <string name="theme_selection_title">테마 선택</string>
+    <string name="theme_indigo">모던 인디고</string>
+    <string name="theme_teal">딥 틸</string>
+    <string name="theme_sunset">선셋 오렌지</string>
+    <string name="theme_purple">비비드 퍼플</string>
+    <string name="theme_blue">오션 블루</string>
+    <string name="theme_green">네이처 그린</string>
+    <string name="theme_red">볼드 레드</string>
+    <string name="theme_app_color_title">앱 색상 테마</string>
+    <string name="map_settings_title">지도 선택</string>
+    <string name="map_source_title">지도 소스</string>
+    <string name="map_source_summary">지도 소스를 선택하세요</string>
+    <string name="map_internal_none">없음 (선택된 지도 없음)</string>
+    <string name="map_internal_format">%1$s (업데이트: %2$s)</string>
+    <string name="map_default_offline">내장 지도 - %s</string>
+    <string name="map_custom_file">사용자 지정 지도 파일 선택</string>
+    <string name="map_select_file">지도 파일 선택</string>
+    <string name="map_source_dialog_title">지도 소스 선택</string>
+    <string name="map_custom_option">사용자 MBTiles 파일</string>
+
+    <!-- Font and UI Size Settings -->
+    <string name="pref_font_title">글꼴</string>
+    <string name="pref_font_summary">앱 글꼴 선택</string>
+    <string name="pref_text_size_title">텍스트 크기</string>
+    <string name="pref_text_size_summary">텍스트 크기 조정</string>
+    <string name="pref_ui_scale_title">UI 크기</string>
+    <string name="pref_ui_scale_summary">UI 요소 크기 조정</string>
+    <string name="font_system">시스템 기본</string>
+    <string name="font_roboto">Roboto</string>
+    <string name="font_sans_serif">Sans Serif</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_monospace">Monospace</string>
+    <string name="text_size_small">작게</string>
+    <string name="text_size_medium">보통</string>
+    <string name="text_size_large">크게</string>
+    <string name="text_size_xlarge">아주 크게</string>
+    <string name="ui_scale_small">작게 (90%)</string>
+    <string name="ui_scale_normal">보통 (100%)</string>
+    <string name="ui_scale_large">크게 (110%)</string>
+    <string name="ui_scale_xlarge">아주 크게 (125%)</string>
+    <string name="map_builtin_option">내장 지도</string>
+    <string name="title_journey">PedalLog</string>
+    <string name="title_statistics">통계</string>
+
+    <string name="stats_empty">주행 기록이 없습니다. 기록을 추가하면 통계를 볼 수 있어요.</string>
+    <string name="stats_need_more">차트를 보려면 주행 기록이 2개 이상 필요합니다.</string>
+    <string name="stats_error">통계를 불러오지 못했습니다. 다시 시도해 주세요.</string>
+    <string name="pref_min_distance_title">확인 최소 거리</string>
+    <string name="pref_min_distance_summary">이 거리(미터) 이상의 주행을 버릴 때 확인 (기본 10m)</string>
+    <string name="discard_confirm_title">주행을 버리시겠습니까?</string>
+    <string name="discard_confirm_message">정말로 이 주행 기록을 버리시겠습니까? 모든 데이터가 삭제됩니다.</string>
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="nav_bar"
+        android:title="@string/pref_nav_bar_title" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="action_bar"
+        android:title="@string/pref_action_bar_title" />
+
+    <Preference
+        android:key="map_source"
+        android:title="@string/map_source_title"
+        android:summary="@string/map_source_summary" />
+
+    <ListPreference
+        android:defaultValue="light"
+        android:entries="@array/theme_entries"
+        android:entryValues="@array/theme_values"
+        android:key="theme"
+        android:title="@string/pref_theme_title" />
+
+    <ListPreference
+        android:defaultValue="Indigo"
+        android:entries="@array/theme_app_color_entries"
+        android:entryValues="@array/theme_app_color_values"
+        android:key="app_theme"
+        android:title="@string/theme_app_color_title" />
+    
+    <ListPreference
+        android:defaultValue="system"
+        android:entries="@array/font_entries"
+        android:entryValues="@array/font_values"
+        android:key="font_family"
+        android:title="@string/pref_font_title"
+        android:summary="@string/pref_font_summary" />
+    
+    <ListPreference
+        android:defaultValue="1.0"
+        android:entries="@array/text_size_entries"
+        android:entryValues="@array/text_size_values"
+        android:key="text_size_scale"
+        android:title="@string/pref_text_size_title"
+        android:summary="@string/pref_text_size_summary" />
+    
+    <ListPreference
+        android:defaultValue="1.0"
+        android:entries="@array/ui_scale_entries"
+        android:entryValues="@array/ui_scale_values"
+        android:key="ui_scale"
+        android:title="@string/pref_ui_scale_title"
+        android:summary="@string/pref_ui_scale_summary" />
+    
+    <EditTextPreference
+        android:defaultValue="10"
+        android:key="min_distance_confirm"
+        android:title="@string/pref_min_distance_title"
+        android:summary="@string/pref_min_distance_summary"
+        android:inputType="number" />
+
+    <ListPreference
+        android:defaultValue="high"
+        android:entries="@array/journey_thumbnail_quality_entries"
+        android:entryValues="@array/journey_thumbnail_quality_values"
+        android:key="journey_thumbnail_quality"
+        android:title="@string/pref_thumbnail_quality_title"
+        android:summary="@string/pref_thumbnail_quality_summary" />
+
+</PreferenceScreen>

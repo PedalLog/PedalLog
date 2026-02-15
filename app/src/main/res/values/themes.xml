@@ -1,0 +1,91 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.PedalLog" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        
+        <!-- Background and Surface -->
+        <item name="android:windowBackground">@color/background_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+
+        <!-- Notch Support -->
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="p">shortEdges</item>
+
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
+        <item name="colorOnSecondaryContainer">?attr/colorPrimary</item>
+    </style>
+
+    <!-- Teal Theme -->
+    <style name="Theme.PedalLog.Teal" parent="Theme.PedalLog">
+        <item name="colorPrimary">@color/teal_primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/teal_secondary</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
+        <item name="colorOnSecondaryContainer">@color/teal_primary</item>
+        <item name="colorSurface">@color/surface_light</item>
+    </style>
+
+    <!-- Sunset Theme -->
+    <style name="Theme.PedalLog.Sunset" parent="Theme.PedalLog">
+        <item name="colorPrimary">@color/sunset_primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/sunset_secondary</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
+        <item name="colorOnSecondaryContainer">@color/sunset_primary</item>
+        <item name="colorSurface">@color/surface_light</item>
+    </style>
+
+    <!-- Purple Theme -->
+    <style name="Theme.PedalLog.Purple" parent="Theme.PedalLog">
+        <item name="colorPrimary">@color/purple_primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/purple_secondary</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
+        <item name="colorOnSecondaryContainer">@color/purple_primary</item>
+        <item name="colorSurface">@color/surface_light</item>
+    </style>
+
+    <!-- Blue Theme -->
+    <style name="Theme.PedalLog.Blue" parent="Theme.PedalLog">
+        <item name="colorPrimary">@color/blue_primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/blue_secondary</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
+        <item name="colorOnSecondaryContainer">@color/blue_primary</item>
+        <item name="colorSurface">@color/surface_light</item>
+    </style>
+
+    <!-- Green Theme -->
+    <style name="Theme.PedalLog.Green" parent="Theme.PedalLog">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/green_secondary</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
+        <item name="colorOnSecondaryContainer">@color/green_primary</item>
+        <item name="colorSurface">@color/surface_light</item>
+    </style>
+
+    <!-- Red Theme -->
+    <style name="Theme.PedalLog.Red" parent="Theme.PedalLog">
+        <item name="colorPrimary">@color/red_primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/red_secondary</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+        <item name="colorSecondaryContainer">@android:color/transparent</item>
+        <item name="colorOnSecondaryContainer">@color/red_primary</item>
+        <item name="colorSurface">@color/surface_light</item>
+    </style>
+</resources>

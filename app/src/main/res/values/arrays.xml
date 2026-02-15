@@ -1,0 +1,98 @@
+<resources>
+    <string-array name="map_files_entries">
+        <item>@string/map_default</item>
+        <item>@string/map_satellite</item>
+    </string-array>
+
+    <string-array name="map_files_values">
+        <item>default</item>
+        <item>satellite</item>
+    </string-array>
+
+    <string-array name="theme_entries">
+        <item>@string/theme_light</item>
+        <item>@string/theme_dark</item>
+        <item>@string/theme_system</item>
+    </string-array>
+
+    <string-array name="theme_values">
+        <item>light</item>
+        <item>dark</item>
+        <item>system</item>
+    </string-array>
+    <string-array name="theme_app_color_entries">
+        <item>@string/theme_indigo</item>
+        <item>@string/theme_teal</item>
+        <item>@string/theme_sunset</item>
+        <item>@string/theme_purple</item>
+        <item>@string/theme_blue</item>
+        <item>@string/theme_green</item>
+        <item>@string/theme_red</item>
+    </string-array>
+
+    <string-array name="theme_app_color_values">
+        <item>Indigo</item>
+        <item>Teal</item>
+        <item>Sunset</item>
+        <item>Purple</item>
+        <item>Blue</item>
+        <item>Green</item>
+        <item>Red</item>
+    </string-array>
+    
+    <string-array name="font_entries">
+        <item>@string/font_system</item>
+        <item>@string/font_roboto</item>
+        <item>@string/font_sans_serif</item>
+        <item>@string/font_serif</item>
+        <item>@string/font_monospace</item>
+    </string-array>
+
+    <string-array name="font_values">
+        <item>system</item>
+        <item>roboto</item>
+        <item>sans_serif</item>
+        <item>serif</item>
+        <item>monospace</item>
+    </string-array>
+    
+    <string-array name="text_size_entries">
+        <item>@string/text_size_small</item>
+        <item>@string/text_size_medium</item>
+        <item>@string/text_size_large</item>
+        <item>@string/text_size_xlarge</item>
+    </string-array>
+
+    <string-array name="text_size_values">
+        <item>0.85</item>
+        <item>1.0</item>
+        <item>1.15</item>
+        <item>1.3</item>
+    </string-array>
+    
+    <string-array name="ui_scale_entries">
+        <item>@string/ui_scale_small</item>
+        <item>@string/ui_scale_normal</item>
+        <item>@string/ui_scale_large</item>
+        <item>@string/ui_scale_xlarge</item>
+    </string-array>
+
+    <string-array name="ui_scale_values">
+        <item>0.9</item>
+        <item>1.0</item>
+        <item>1.1</item>
+        <item>1.25</item>
+    </string-array>
+
+    <string-array name="journey_thumbnail_quality_entries">
+        <item>@string/quality_high</item>
+        <item>@string/quality_medium</item>
+        <item>@string/quality_low</item>
+    </string-array>
+
+    <string-array name="journey_thumbnail_quality_values">
+        <item>high</item>
+        <item>medium</item>
+        <item>low</item>
+    </string-array>
+</resources>

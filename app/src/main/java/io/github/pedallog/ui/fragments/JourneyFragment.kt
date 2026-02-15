@@ -1,0 +1,278 @@
+package io.github.pedallog.ui.fragments
+
+import android.Manifest
+import android.os.Build
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.View
+import android.view.LayoutInflater
+import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.github.pedallog.R
+import io.github.pedallog.adapters.JourneyAdapter
+import io.github.pedallog.databinding.DialogJourneyMapBinding
+import io.github.pedallog.databinding.FragmentJourneyBinding
+import io.github.pedallog.db.Journey
+import io.github.pedallog.other.Constants.REQUEST_CODE_LOCATION_PERMISSION
+import io.github.pedallog.other.TrackingUtility
+import io.github.pedallog.ui.viewmodels.PedalLogViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import androidx.activity.result.contract.ActivityResultContracts
+import android.content.Intent
+import io.github.pedallog.SettingsActivity
+import android.view.Window
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.preference.PreferenceManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
+import androidx.core.view.updatePadding
+import javax.inject.Inject
+import io.github.pedallog.ui.JourneyMapActivity
+
+// This fragment will display all the journeys tracked using our app
+@AndroidEntryPoint
+class JourneyFragment : Fragment(R.layout.fragment_journey) {
+
+    val viewModel: PedalLogViewModel by viewModels()
+
+    lateinit var binding: FragmentJourneyBinding
+    lateinit var adapter: JourneyAdapter
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val foregroundLocationGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: true
+        val notificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions[Manifest.permission.POST_NOTIFICATIONS] ?: true
+        } else true
+
+        if (!foregroundLocationGranted || !notificationGranted) {
+            Toast.makeText(requireContext(), getString(R.string.essential_permissions_denied), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentJourneyBinding.bind(view)
+        requestPermissions()
+
+        adapter = JourneyAdapter()
+
+        binding.rvJourney.adapter = adapter
+        binding.rvJourney.layoutManager = LinearLayoutManager(requireContext())
+
+        applyBottomBarPaddingToList()
+
+        viewModel.journeyList.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
+        })
+
+        adapter.setOnItemClickListener {
+            showJourneyDetails(it)
+        }
+        
+        adapter.setOnDeleteClickListener {
+            deleteJourney(it)
+        }
+        
+        adapter.setOnAnalyzeClickListener {
+            showJourneyAnalysis(it)
+        }
+
+        adapter.setOnMapClickListener {
+            showJourneyMap(it)
+        }
+    }
+
+    private fun applyBottomBarPaddingToList() {
+        // BottomAppBar overlays the fragment content. Without extra bottom padding,
+        // the last items can end up hidden behind the bar/FAB and look like scrolling is "stuck".
+        val bottomBar = activity?.findViewById<View>(R.id.bottomAppBar)
+        val initialPaddingLeft = binding.rvJourney.paddingLeft
+        val initialPaddingTop = binding.rvJourney.paddingTop
+        val initialPaddingRight = binding.rvJourney.paddingRight
+        val initialPaddingBottom = binding.rvJourney.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rvJourney) { listView, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val bottomBarHeight = bottomBar?.height ?: 0
+            listView.updatePadding(
+                left = initialPaddingLeft + systemBars.left,
+                top = initialPaddingTop,
+                right = initialPaddingRight + systemBars.right,
+                bottom = initialPaddingBottom + systemBars.bottom + bottomBarHeight
+            )
+            insets
+        }
+
+        // Re-apply after layout so bottom bar height is non-zero.
+        binding.rvJourney.doOnLayout {
+            ViewCompat.requestApplyInsets(binding.rvJourney)
+        }
+    }
+
+    private fun applySystemBarsPreference(window: Window?) {
+        if (window == null) return
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val navBarVisible = sharedPreferences.getBoolean("nav_bar", true)
+        val actionBarVisible = sharedPreferences.getBoolean("action_bar", true)
+
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        if (!navBarVisible) {
+            windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        } else {
+            windowInsetsController.show(WindowInsetsCompat.Type.navigationBars())
+        }
+
+        if (!actionBarVisible) {
+            windowInsetsController.hide(WindowInsetsCompat.Type.statusBars())
+        } else {
+            windowInsetsController.show(WindowInsetsCompat.Type.statusBars())
+        }
+    }
+    
+    // Function to show journey details
+    private fun showJourneyDetails(journey: Journey) {
+        val dateFormat = java.text.SimpleDateFormat("yyyy/MM/dd HH:mm", java.util.Locale.getDefault())
+        
+        // Format distance
+        val distanceStr = if (journey.distance < 1.0f) {
+            "${(journey.distance * 1000).toInt()} ${getString(R.string.unit_m)}"
+        } else {
+            "${String.format("%.2f", journey.distance)} ${getString(R.string.unit_km)}"
+        }
+        
+        val details = """
+            ${getString(R.string.date)}: ${dateFormat.format(java.util.Date(journey.dateCreated))}
+            ${getString(R.string.distance)}: $distanceStr
+            ${getString(R.string.avg_speed)}: ${journey.speed} ${getString(R.string.unit_kmh)}
+            ${getString(R.string.duration)}: ${io.github.pedallog.other.TrackingUtility.getFormattedStopwatchTime(journey.duration)}
+        """.trimIndent()
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.journey_details_title))
+            .setMessage(details)
+            .setPositiveButton(getString(R.string.yes)) { d, _ -> d.dismiss() }
+            .create()
+
+        dialog.setOnShowListener { applySystemBarsPreference(dialog.window) }
+        dialog.setOnDismissListener { applySystemBarsPreference(requireActivity().window) }
+        dialog.show()
+    }
+
+    private fun showJourneyMap(journey: Journey) {
+        val routeJson = journey.routeJson
+        val id = journey.id
+        if (!routeJson.isNullOrBlank() && id != null) {
+            val intent = Intent(requireContext(), JourneyMapActivity::class.java)
+                .putExtra(JourneyMapActivity.EXTRA_JOURNEY_ID, id)
+            startActivity(intent)
+            return
+        }
+
+        val bmp = journey.img
+        if (bmp == null) {
+            Toast.makeText(requireContext(), getString(R.string.journey_map_unavailable), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val mapBinding = DialogJourneyMapBinding.inflate(LayoutInflater.from(requireContext()))
+        mapBinding.ivJourneyMap.setImageBitmap(bmp)
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.journey_map_title))
+            .setView(mapBinding.root)
+            .setPositiveButton(getString(R.string.ok)) { d, _ -> d.dismiss() }
+            .create()
+
+        dialog.setOnShowListener { applySystemBarsPreference(dialog.window) }
+        dialog.setOnDismissListener { applySystemBarsPreference(requireActivity().window) }
+        dialog.show()
+    }
+    
+    // Function to show journey analysis
+    private fun showJourneyAnalysis(journey: Journey) {
+        val avgSpeedKmh = journey.speed
+        val durationHours = journey.duration / 3600000f
+        val caloriesBurned = (journey.distance * 50).toInt() // Simple estimation
+        
+        // Format distance
+        val distanceStr = if (journey.distance < 1.0f) {
+            "${(journey.distance * 1000).toInt()} ${getString(R.string.unit_m)}"
+        } else {
+            "${String.format("%.2f", journey.distance)} ${getString(R.string.unit_km)}"
+        }
+        
+        val analysis = """
+            ${getString(R.string.distance)}: $distanceStr
+            ${getString(R.string.avg_speed)}: $avgSpeedKmh ${getString(R.string.unit_kmh)}
+            ${getString(R.string.duration)}: ${String.format("%.2f", durationHours)} hours
+            Estimated Calories: ~$caloriesBurned kcal
+        """.trimIndent()
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.analyze))
+            .setMessage(analysis)
+            .setPositiveButton(getString(R.string.yes)) { d, _ -> d.dismiss() }
+            .create()
+
+        dialog.setOnShowListener { applySystemBarsPreference(dialog.window) }
+        dialog.setOnDismissListener { applySystemBarsPreference(requireActivity().window) }
+        dialog.show()
+    }
+
+    // Function to delete a journey
+    private fun deleteJourney(journey: Journey) {
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.delete_title))
+            .setMessage(getString(R.string.delete_journey_message))
+            .setIcon(R.drawable.ic_delete)
+            .setPositiveButton(getString(R.string.yes)) { d,_ ->
+                viewModel.deleteJourney(journey)
+                d.cancel()
+            }
+            .setNegativeButton(getString(R.string.no)) { d,_ -> d.cancel() }
+            .create()
+
+        dialog.setOnShowListener { applySystemBarsPreference(dialog.window) }
+        dialog.setOnDismissListener { applySystemBarsPreference(requireActivity().window) }
+        dialog.show()
+    }
+
+
+    // Function to request location permissions
+    private fun requestPermissions() {
+        val permissions = mutableListOf<String>()
+
+        if (!TrackingUtility.hasLocationPermissions(requireContext())) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            permissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (TrackingUtility.hasLocationPermissions(requireContext()) && 
+                !TrackingUtility.hasBackgroundLocationPermission(requireContext())) {
+                // background location should ideally be requested separately on Android 11+
+                // permissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!TrackingUtility.hasNotificationPermission(requireContext())) {
+                permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        if (permissions.isNotEmpty()) {
+            requestPermissionLauncher.launch(permissions.toTypedArray())
+        }
+    }
+}

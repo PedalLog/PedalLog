@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/journeyFragment"
+        android:icon="@drawable/ic_journey"
+        android:title="@string/menu_journey" />
+    <item
+        android:id="@+id/placeholder"
+        android:title=""
+        android:enabled="false"
+        android:visible="false" />
+    <item
+        android:id="@+id/statisticsFragment"
+        android:icon="@drawable/ic_statistics"
+        android:title="@string/menu_stats" />
+</menu>
