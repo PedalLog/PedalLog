@@ -99,11 +99,11 @@
    - ✅ **Resolution**: Updated to intended version 9.0.0
    - **Issue resolved**
 
-2. **KSP: 2.3.5 → 2.3.10-1.0.29**
-   - ❗ **Issue**: KSP versions must match Kotlin version pattern
-   - 🔍 **Pattern**: KSP uses format `<kotlin-version>-<ksp-version>`
-   - ✅ **Decision**: Updated to 2.3.10-1.0.29 to properly align with Kotlin 2.3.10
-   - **Properly configured**
+2. **KSP: Preserved at 2.3.5**
+   - ✅ **Status**: Using original KSP version 2.3.5 from project configuration
+   - 🔍 **Compatibility**: KSP 2.3.5 is compatible with Kotlin 2.3.10
+   - ✅ **Note**: KSP versioning doesn't strictly follow Kotlin version numbers
+   - **No changes needed**
 
 3. **foojay-resolver-convention: Removed**
    - ❗ **Issue**: Version 1.0.0 not found in plugin repositories

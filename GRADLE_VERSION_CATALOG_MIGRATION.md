@@ -162,10 +162,10 @@ resolutionStrategy {
    - **Compatibility**: Compatible with Navigation SafeArgs 2.9.7 (requires AGP 8.4.0+)
    - **Note**: Initially changed to 8.4.0 due to network restrictions during migration, now updated to intended version
 
-2. **KSP (Kotlin Symbol Processing)**: `2.3.5` → `2.3.10-1.0.29`
-   - **Reason**: KSP version must match Kotlin version pattern: `<kotlin-version>-<ksp-version>`
-   - **Note**: Updated to 2.3.10-1.0.29 to properly align with Kotlin 2.3.10
-   - **Pattern**: KSP versions follow the Kotlin version they're built for
+2. **KSP (Kotlin Symbol Processing)**: Preserved at `2.3.5`
+   - **Status**: Using original KSP version 2.3.5 from project configuration
+   - **Compatibility**: KSP 2.3.5 is compatible with Kotlin 2.3.10
+   - **Note**: KSP versioning doesn't strictly follow Kotlin version numbers
 
 3. **foojay-resolver-convention plugin**: Removed
    - **Reason**: Version 1.0.0 not available in plugin repositories

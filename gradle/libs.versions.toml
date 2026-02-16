@@ -13,9 +13,8 @@ android-targetSdk = "36"
 android-gradle-plugin = "9.0.0"
 kotlin = "2.3.10"
 kotlin-stdlib = "2.2.20"
-# KSP version must match Kotlin version pattern: <kotlin-version>-<ksp-version>
-# Using KSP 2.3.10-1.0.29 to match Kotlin 2.3.10
-ksp = "2.3.10-1.0.29"
+# KSP version 2.3.5 (from original configuration, compatible with Kotlin 2.3.10)
+ksp = "2.3.5"
 navigation-safeargs = "2.9.7"
 hilt = "2.59.1"
 
