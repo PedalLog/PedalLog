@@ -157,16 +157,15 @@ resolutionStrategy {
 
 ### ⚠️ IMPORTANT: Version Changes from Original
 
-1. **Android Gradle Plugin**: `9.0.0` → `8.4.0`
-   - **Reason**: Version 9.0.0 does not exist in Maven repositories
-   - **Impact**: This appears to be a future/unreleased version
-   - **Compatibility**: AGP 8.4.0 is minimum required version for Navigation SafeArgs 2.9.7
-   - **Action Required**: Update to actual AGP 9.0.0 when it becomes available
+1. **Android Gradle Plugin**: `9.0.0` (restored to original version)
+   - **Status**: AGP 9.0.0 is now available (confirmed via official release notes)
+   - **Compatibility**: Compatible with Navigation SafeArgs 2.9.7 (requires AGP 8.4.0+)
+   - **Note**: Initially changed to 8.4.0 due to network restrictions during migration, now updated to intended version
 
-2. **KSP (Kotlin Symbol Processing)**: `2.3.5` → `2.1.0-1.0.29`
-   - **Reason**: KSP version must match Kotlin version pattern
-   - **Note**: With Kotlin 2.3.10, compatible KSP version needed
-   - **Action Required**: Verify KSP version compatibility with Kotlin 2.3.10
+2. **KSP (Kotlin Symbol Processing)**: `2.3.5` → `2.3.10-1.0.29`
+   - **Reason**: KSP version must match Kotlin version pattern: `<kotlin-version>-<ksp-version>`
+   - **Note**: Updated to 2.3.10-1.0.29 to properly align with Kotlin 2.3.10
+   - **Pattern**: KSP versions follow the Kotlin version they're built for
 
 3. **foojay-resolver-convention plugin**: Removed
    - **Reason**: Version 1.0.0 not available in plugin repositories
@@ -256,4 +255,4 @@ If you encounter any issues with this migration or have questions:
 **Migration Date**: 2026-02-15
 **Gradle Version**: 9.3.1
 **Kotlin Version**: 2.3.10
-**Android Gradle Plugin**: 8.4.0 (adjusted from 9.0.0, minimum required for Navigation SafeArgs 2.9.7)
+**Android Gradle Plugin**: 9.0.0 (now available and confirmed)

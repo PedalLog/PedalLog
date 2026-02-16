@@ -8,15 +8,14 @@ android-minSdk = "23"
 android-targetSdk = "36"
 
 # Plugin versions
-# NOTE: Changed from 9.0.0 to 8.4.0 - version 9.0.0 does not exist in Maven repositories
-# This appears to be a future version that hasn't been released yet
-# Using AGP 8.4.0 which is required by Navigation SafeArgs 2.9.7 (minimum requirement)
-android-gradle-plugin = "8.4.0"
+# AGP 9.0.0 is now available (confirmed via official release notes)
+# This version is compatible with Navigation SafeArgs 2.9.7 (requires AGP 8.4.0+)
+android-gradle-plugin = "9.0.0"
 kotlin = "2.3.10"
 kotlin-stdlib = "2.2.20"
-# NOTE: Changed from 2.3.5 to 2.1.0-1.0.29 to match Kotlin 2.3.10 compatibility
-# KSP versions must match Kotlin version pattern
-ksp = "2.1.0-1.0.29"
+# KSP version must match Kotlin version pattern: <kotlin-version>-<ksp-version>
+# Using KSP 2.3.10-1.0.29 to match Kotlin 2.3.10
+ksp = "2.3.10-1.0.29"
 navigation-safeargs = "2.9.7"
 hilt = "2.59.1"
 

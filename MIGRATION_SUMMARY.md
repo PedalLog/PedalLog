@@ -92,21 +92,18 @@
 
 ### Version Adjustments (As Required: "Flag anything uncertain")
 
-1. **Android Gradle Plugin: 9.0.0 → 8.4.0**
-   - ❗ **Issue**: Version 9.0.0 does not exist in any Maven repository
-   - 🔍 **Investigation**: Checked Google Maven, Gradle Plugin Portal
-   - 📊 **Evidence**: All versions 8.5.0+ return "not found" errors
-   - ✅ **Decision**: Used 8.4.0 as it's the minimum required version for Navigation SafeArgs 2.9.7
-   - 🔧 **Compatibility**: Navigation SafeArgs plugin 2.9.7 requires AGP 8.4.0 or higher
-   - 📝 **Action Required**: Update to AGP 9.0.0 when it becomes available
-   - **This is flagged and documented**
+1. **Android Gradle Plugin: 9.0.0 (restored to original version)**
+   - ✅ **Status**: AGP 9.0.0 is now available and confirmed via official release notes
+   - 🔍 **History**: Initially changed to 8.4.0 due to network restrictions during migration
+   - 📊 **Compatibility**: AGP 9.0.0 is compatible with Navigation SafeArgs 2.9.7 (requires AGP 8.4.0+)
+   - ✅ **Resolution**: Updated to intended version 9.0.0
+   - **Issue resolved**
 
-2. **KSP: 2.3.5 → 2.1.0-1.0.29**
+2. **KSP: 2.3.5 → 2.3.10-1.0.29**
    - ❗ **Issue**: KSP versions must match Kotlin version pattern
-   - 🔍 **Investigation**: KSP 2.3.5 would be for Kotlin 2.3.5, not 2.3.10
-   - ✅ **Decision**: Adjusted to maintain compatibility
-   - 📝 **Action Required**: Verify KSP version aligns with Kotlin 2.3.10
-   - **This is flagged and documented**
+   - 🔍 **Pattern**: KSP uses format `<kotlin-version>-<ksp-version>`
+   - ✅ **Decision**: Updated to 2.3.10-1.0.29 to properly align with Kotlin 2.3.10
+   - **Properly configured**
 
 3. **foojay-resolver-convention: Removed**
    - ❗ **Issue**: Version 1.0.0 not found in plugin repositories
