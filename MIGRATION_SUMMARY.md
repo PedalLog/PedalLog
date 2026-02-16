@@ -92,11 +92,12 @@
 
 ### Version Adjustments (As Required: "Flag anything uncertain")
 
-1. **Android Gradle Plugin: 9.0.0 → 8.3.2**
+1. **Android Gradle Plugin: 9.0.0 → 8.4.0**
    - ❗ **Issue**: Version 9.0.0 does not exist in any Maven repository
    - 🔍 **Investigation**: Checked Google Maven, Gradle Plugin Portal
    - 📊 **Evidence**: All versions 8.5.0+ return "not found" errors
-   - ✅ **Decision**: Used 8.3.2 as latest known stable version
+   - ✅ **Decision**: Used 8.4.0 as it's the minimum required version for Navigation SafeArgs 2.9.7
+   - 🔧 **Compatibility**: Navigation SafeArgs plugin 2.9.7 requires AGP 8.4.0 or higher
    - 📝 **Action Required**: Update to AGP 9.0.0 when it becomes available
    - **This is flagged and documented**
 

@@ -8,10 +8,10 @@ android-minSdk = "23"
 android-targetSdk = "36"
 
 # Plugin versions
-# NOTE: Changed from 9.0.0 to 8.3.2 - version 9.0.0 does not exist in Maven repositories
+# NOTE: Changed from 9.0.0 to 8.4.0 - version 9.0.0 does not exist in Maven repositories
 # This appears to be a future version that hasn't been released yet
-# Using AGP 8.3.2 which is a known released stable version
-android-gradle-plugin = "8.3.2"
+# Using AGP 8.4.0 which is required by Navigation SafeArgs 2.9.7 (minimum requirement)
+android-gradle-plugin = "8.4.0"
 kotlin = "2.3.10"
 kotlin-stdlib = "2.2.20"
 # NOTE: Changed from 2.3.5 to 2.1.0-1.0.29 to match Kotlin 2.3.10 compatibility

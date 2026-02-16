@@ -157,9 +157,10 @@ resolutionStrategy {
 
 ### ⚠️ IMPORTANT: Version Changes from Original
 
-1. **Android Gradle Plugin**: `9.0.0` → `8.3.2`
+1. **Android Gradle Plugin**: `9.0.0` → `8.4.0`
    - **Reason**: Version 9.0.0 does not exist in Maven repositories
    - **Impact**: This appears to be a future/unreleased version
+   - **Compatibility**: AGP 8.4.0 is minimum required version for Navigation SafeArgs 2.9.7
    - **Action Required**: Update to actual AGP 9.0.0 when it becomes available
 
 2. **KSP (Kotlin Symbol Processing)**: `2.3.5` → `2.1.0-1.0.29`
@@ -255,4 +256,4 @@ If you encounter any issues with this migration or have questions:
 **Migration Date**: 2026-02-15
 **Gradle Version**: 9.3.1
 **Kotlin Version**: 2.3.10
-**Android Gradle Plugin**: 8.3.2 (adjusted from 9.0.0)
+**Android Gradle Plugin**: 8.4.0 (adjusted from 9.0.0, minimum required for Navigation SafeArgs 2.9.7)
